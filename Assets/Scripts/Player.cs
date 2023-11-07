@@ -1,19 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Rendering;
 
 public class Player : MonoBehaviour
 {
-    public Text phaseDisplayText;
-    private Touch _theTouch;
-    private float _timeTouchEnded;
-    private float displayTime = 0.5f;
-
+    //Movement Variables
     private Vector3 _position;
     private float width;
     private float height;
 
+    //Fire Cooldown Variables
+    [SerializeField]
+    private float _fireRate = 0.5f;
+    private float _canFire = -1.0f;
+
+    //Lasers
+    [SerializeField]
+    private GameObject _laserMainPrefab;
+
+    [SerializeField]
+    private float _instaniateDistance = 3;
 
     // Start is called before the first frame update
     void Start()
@@ -33,26 +40,6 @@ public class Player : MonoBehaviour
     void Update()
     {
         Movement();
-        ////Touch Screen Example
-
-        //if (Input.touchCount > 0)
-        //{
-        //    _theTouch = Input.GetTouch(0);
-        //    if (_theTouch.phase == TouchPhase.Ended)
-        //    {
-        //        phaseDisplayText.text = _theTouch.phase.ToString();
-        //        _timeTouchEnded = Time.time;
-        //    }
-        //    else if (Time.time - _timeTouchEnded > displayTime)
-        //    {
-        //        phaseDisplayText.text = _theTouch.phase.ToString();
-        //        _timeTouchEnded = Time.time;
-        //    }
-        //}
-        //else if (Time.time - _timeTouchEnded > displayTime)
-        //{
-        //    phaseDisplayText.text = "";
-        //}
     }
 
     private void Movement()
@@ -76,9 +63,9 @@ public class Player : MonoBehaviour
             if (touch.phase == TouchPhase.Stationary || touch.phase == TouchPhase.Moved)
             {
                 Vector3 touchPosition = Camera.main.ScreenToWorldPoint(new Vector3(touch.position.x, touch.position.y, 34.0f));
-
-
                 transform.position = touchPosition;
+
+                FireLaserMain();
             }
             else if (touch.phase == TouchPhase.Canceled)
             {
@@ -96,6 +83,12 @@ public class Player : MonoBehaviour
             //    transform.position = _position;
             //}
         }
+    }
+
+    private void FireLaserMain()
+    {
+        _canFire = Time.time + _fireRate;
+        Instantiate(_laserMainPrefab, transform.position + new Vector3(_instaniateDistance, 0, 0), Quaternion.identity);
     }
     
 }
